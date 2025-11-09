@@ -117,9 +117,9 @@ def insert_menu_from_csv(csv_path="menu.csv"):
     with open(csv_path, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            menu_id = int(row["menu_id"]) if row.get("menu_id") else None
+            menu_id = row.get("menu_id")
             r_id = int(row["r_id"]) if row.get("r_id") else None
-            f_id = int(row["f_id"]) if row.get("f_id") else None
+            f_id    = row.get("f_id")
             cuisine = row.get("cuisine")
             price = float(
                 row["price"]) if row.get("price") not in (None, "") else None

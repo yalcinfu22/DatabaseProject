@@ -4,6 +4,7 @@ from flask import Flask, jsonify
 
 # viewlerimiz ana dal server'da herkes views folderında kendi endpointlerini yazcak
 from views.courier_view import courier
+from views.menu_view import menu
 import app_views
 # from views.user_view import user
 # from views.restaurant_view import restaurant
@@ -20,6 +21,7 @@ def create_app():
     app.add_url_rule("/user_submit_form",view_func= app_views.user_submit_signup_form, methods=["POST"])
     # --- views baseleri burada tekrar tekrar yazmayalım ve kirletmeyelim burayı diye
     app.register_blueprint(courier, url_prefix='/couriers')
+    app.register_blueprint(menu, url_prefix='/menus')
     return app
     #app.register_blueprint(user, url_prefix='/users')
 #
