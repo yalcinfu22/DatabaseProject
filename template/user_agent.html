@@ -9,6 +9,7 @@
     </head>
     <body>
 <section class="h-100 bg-dark">
+    <form action="/user_submit_form" method="Post">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col">
@@ -19,6 +20,7 @@
                 alt="Sample photo" class="img-fluid"
                 style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem; height: 100%;" />
             </div>
+            
             <div class="col-xl-6">
               <div class="card-body p-md-5 text-black">
                 <h3 class="mb-5 text-uppercase">Signup as User</h3>
@@ -26,14 +28,14 @@
                 <div class="row">
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="text" id="form3Example1m" class="form-control form-control-lg" placeholder="e.g., Amr" />
-                      <label class="form-label" for="form3Example1m">First name</label>
+                      <input type="text" id="form3Example1m" class="form-control fosrm-control-lg" placeholder="e.g., Amr" name="first_name"/>
+                      <label class="form-label" for="form3Example1m" >First name</label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="text" id="form3Example1n" class="form-control form-control-lg" placeholder="e.g., Taweel" />
-                      <label class="form-label" for="form3Example1n">Last name</label>
+                      <input type="text" id="form3Example1n" class="form-control form-control-lg" placeholder="e.g., Taweel" name="last_name"/>
+                      <label class="form-label" for="form3Example1n" >Last name</label>
                     </div>
                   </div>
                 </div>
@@ -41,13 +43,13 @@
                 <div class="row">
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="text" id="form3Example1m1" class="form-control form-control-lg" placeholder="e.g., Student(Optional)" />
-                      <label class="form-label" for="form3Example1m1">Occupation</label>
+                      <input type="text" id="form3Example1m1" class="form-control form-control-lg" placeholder="e.g., Student(Optional)" name="occupation" />
+                      <label class="form-label" for="form3Example1m1" >Occupation</label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="text" id="form3Example1n1" class="form-control form-control-lg"  placeholder="e.g., 20(Optional)" />
+                      <input type="number" id="form3Example1n1" class="form-control form-control-lg"  placeholder="e.g., 20(Optional)" name="age" />
                       <label class="form-label" for="form3Example1n1">Age</label>
                     </div>
                   </div>
@@ -55,23 +57,24 @@
                 <div class="row">
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="password" id="form3Example1m1" class="form-control form-control-lg" placeholder="less than 17 character" />
+                      <input type="password" id="form3Example1m1" class="form-control form-control-lg" placeholder="less than 17 character" name="password" />
                       <label class="form-label" for="form3Example1m1">Password</label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
                     <div data-mdb-input-init class="form-outline">
-                      <input type="text" id="form3Example1n1" class="form-control form-control-lg"  placeholder="e.g., Istanbul"/>
+                      <input type="text" id="form3Example1n1" class="form-control form-control-lg"  placeholder="e.g., Istanbul" name="city"/>
                       <label class="form-label" for="form3Example1n1">City</label>
                     </div>
                   </div>
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
-                  <input type="text" id="form3Example97" class="form-control form-control-lg" placeholder="e.g., amr@gmail.com"/>
+                  <input type="text" id="form3Example97" class="form-control form-control-lg" placeholder="e.g., amr@gmail.com" name="email"/>
                   <label class="form-label" for="form3Example97">Email </label>
                 </div>
                 <div data-mdb-input-init class="form-outline mb-4">
-                  <input type="text" id="form3Example8" class="form-control form-control-lg" placeholder="e.g., Kagithane, Tasci Caddesi, Bina 1(Optional)" />
+                  <input type="text" id="form3Example8" class="form-control form-control-lg" placeholder="e.g., Kagithane, Tasci Caddesi, Bina 1(Optional)" 
+                  title="address"/>
                   <label class="form-label" for="form3Example8">Address</label>
                 </div>
                 
@@ -81,20 +84,20 @@
                   <h6 class="mb-0 me-4">Gender: </h6>
 
                   <div class="form-check form-check-inline mb-0 me-4">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="femaleGender"
-                      value="option1" />
+                    <input class="form-check-input" type="radio"  id="femaleGender"
+                      value="Female" name ="gender" />
                     <label class="form-check-label" for="femaleGender">Female</label>
                   </div>
 
                   <div class="form-check form-check-inline mb-0 me-4">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="maleGender"
-                      value="option2" />
+                    <input class="form-check-input" type="radio" name ="gender" id="maleGender"
+                      value="Male" />
                     <label class="form-check-label" for="maleGender">Male</label>
                   </div>
 
                   <div class="form-check form-check-inline mb-0">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="otherGender"
-                      value="option3" />
+                    <input class="form-check-input" type="radio" name ="gender" id="otherGender"
+                      value="Prefer not to say" />
                     <label class="form-check-label" for="otherGender">Prefer not to say</label>
                   </div>
 
@@ -154,7 +157,7 @@
 
                 <div class="d-flex justify-content-end pt-3">
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-light btn-lg">Reset all</button>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-lg ms-2">Submit form</button>
+                  <button  type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-lg ms-2">Submit form</button>
                 </div>
 
               </div>
@@ -164,6 +167,7 @@
       </div>
     </div>
   </div>
+  </form>
 </section>
 </body>
 </html>

@@ -17,6 +17,7 @@ def create_app():
     app.config.update(app.config["DB_CONFIG"])
     app.add_url_rule("/user_signup",view_func= app_views.user_signup)
     app.add_url_rule("/",view_func= app_views.home_page)
+    app.add_url_rule("/user_submit_form",view_func= app_views.user_submit_signup_form, methods=["POST"])
     # --- views baseleri burada tekrar tekrar yazmayalım ve kirletmeyelim burayı diye
     app.register_blueprint(courier, url_prefix='/couriers')
     return app
