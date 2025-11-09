@@ -1,24 +1,25 @@
 # server.py
 from flask import Flask, jsonify
-import mysql.connector
+
 
 # viewlerimiz ana dal server'da herkes views folderında kendi endpointlerini yazcak
 from views.courier_view import courier
+import app_views
 # from views.user_view import user
 # from views.restaurant_view import restaurant
 # from views.menu_view import menu
 # from views.order_view import order
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__,template_folder="template", static_folder="static")
     
     app.config.from_object("config.settings")
     app.config.update(app.config["DB_CONFIG"])
-
-
+    app.add_url_rule("/user_signup",view_func= app_views.user_signup)
+    app.add_url_rule("/",view_func= app_views.home_page)
     # --- views baseleri burada tekrar tekrar yazmayalım ve kirletmeyelim burayı diye
     app.register_blueprint(courier, url_prefix='/couriers')
-    
+    return app
     #app.register_blueprint(user, url_prefix='/users')
 #
     #app.register_blueprint(restaurant, url_prefix='/restaurants')
@@ -29,21 +30,6 @@ def create_app():
 
 
     # --- DB ve API check ---- #
-    @app.route("/")
-    def home_page():
-        try:
-            db = mysql.connector.connect(
-                host=app.config["DB_HOST"],
-                user=app.config["DB_USER"],
-                password=app.config["DB_PASSWORD"],
-                database=app.config["DB_NAME"]
-            )
-            db.close()
-            return jsonify({"status": "online", "message": "API is running and DB connection is successful."})
-        except mysql.connector.Error as err:
-            return jsonify({"status": "error", "message": f"API is running, but DB connection failed: {err}"}), 500
-
-    return app
 
 
 if __name__ == "__main__":
