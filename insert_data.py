@@ -26,6 +26,7 @@ def insert_user():
                 values = (id, name, email, password, age, gender,
                           marital_status, occupation, monthly_income, city,
                           address)
+                          
                 mycursor.execute(query, values)
             i = 1
         mydb.commit()
