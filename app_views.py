@@ -27,10 +27,10 @@ def  user_submit_signup_form():
      occupation = request.form.get("occupation")
      age = request.form.get("age")
      password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-     db = db_helper.get_db_connection("localhost", "root", "227maram","term_project")
+     db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
      query = (
                     "INSERT INTO `user` "
-                    "(user_name, email, password, age, gender, martial_status, occuption, monthly_income, city, address) "
+                    "(name, email, password, Age, Gender, Marital_Status, Occupation, Monthly_Income, city, address) "
                     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
      values = (first_name + " " + last_name, email, password_hash, age, gender,
                           status, occupation, salary, city,
