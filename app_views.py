@@ -4,17 +4,14 @@ from flask import jsonify
 import bcrypt
 from helpers import db_helper
 def home_page():
-        try:
-            db = mysql.connector.connect(
-                host="",
-                user="",
-                password="",
-                database=""
-            )
-            db.close()
-            return jsonify({"status": "online", "message": "API is running and DB connection is successful."})
-        except mysql.connector.Error as err:
-            return jsonify({"status": "error", "message": f"API is running, but DB connection failed: {err}"}), 500
+    cart_count = 0  # or pull from session / DB
+    return render_template("main_page.html",
+                           active_page="home",
+                           cart_count=cart_count)
+def user_login():
+    return render_template("login.html")
+def restaurants():
+    return render_template("restaurants.html")
 def user_signup():
     return render_template("/user_agent.html")
 def  user_submit_signup_form():
@@ -29,12 +26,13 @@ def  user_submit_signup_form():
      status = request.form.get("martial_status")
      occupation = request.form.get("occupation")
      age = request.form.get("age")
+     password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
      db = db_helper.get_db_connection("localhost", "root", "227maram","term_project")
      query = (
                     "INSERT INTO `user` "
                     "(user_name, email, password, age, gender, martial_status, occuption, monthly_income, city, address) "
                     "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-     values = (first_name + " " + last_name, email, password, age, gender,
+     values = (first_name + " " + last_name, email, password_hash, age, gender,
                           status, occupation, salary, city,
                           address)
      mycursor = db.cursor()
