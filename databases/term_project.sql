@@ -92,6 +92,7 @@ CREATE TABLE Orders (
     m_id INT NOT NULL,
     c_id INT NOT NULL,
     IsDelivered BOOLEAN DEFAULT TRUE,
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
     FOREIGN KEY (r_id) REFERENCES Restaurant(r_id) ON DELETE CASCADE,
