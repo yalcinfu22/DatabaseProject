@@ -59,6 +59,16 @@ CREATE TABLE Menu (
     FOREIGN KEY (f_id) REFERENCES Food(f_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE `Menu`
+  ADD CONSTRAINT `chk_price_nonneg`
+  CHECK (`price` IS NULL OR `price` >= 0);
+
+ALTER TABLE `Menu`
+  ADD KEY `idx_menu_rid` (`r_id`),
+  ADD KEY `idx_menu_fid` (`f_id`),
+  ADD KEY `idx_menu_price` (`price`),
+  ADD KEY `idx_menu_cuisine` (`cuisine`);
+
 -- 5. Courier Table
 CREATE TABLE Courier (
     c_id INT PRIMARY KEY AUTO_INCREMENT,
