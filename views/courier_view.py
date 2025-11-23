@@ -1,6 +1,6 @@
 import mysql.connector
 import bcrypt
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session, current_app
 from helpers import db_helper
 
 courier = Blueprint('courier', __name__)
@@ -24,7 +24,8 @@ def courier_submit_login():
         return "Email and password are required", 400
     
     # Database lookup
-    db = db_helper.get_db_connection("localhost", "root", "123654", "term_project")
+        db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
     cursor = db.cursor(dictionary=True)
     
     try:
@@ -85,8 +86,8 @@ def submit_signup():
     expected_min = float(expected_payment)
     expected_max = expected_min * 1.2 
 
-    # 5. Database Operation
-    db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
     cursor = db.cursor()
 
     query = """
@@ -121,7 +122,8 @@ def submit_signup():
 @courier.route("/", methods=["GET"])
 def get_all_couriers():
     """Fetches all couriers as JSON."""
-    db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
     
@@ -139,7 +141,8 @@ def get_all_couriers():
 @courier.route("/<int:courier_id>", methods=["GET"])
 def get_courier(courier_id):
     """Fetches a single courier by c_id."""
-    db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
         
@@ -190,7 +193,8 @@ def create_courier_api():
     expected_min = float(expected_payment)
     expected_max = expected_min * 1.2
 
-    db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
         

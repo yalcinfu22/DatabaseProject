@@ -44,57 +44,45 @@
 
     <!-- RIGHT: Restaurant cards -->
     <div class="col-12 col-md-9 col-lg-10">
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-
-        <div class="col d-flex justify-content-center">
-          <div class="card h-100 shadow-sm" style="width: 90%;">
-            <img src="https://markantalya.com/wp-content/uploads/2023/02/burgerking.jpg"
-                 class="card-img-top" alt="Restaurant 1">
-            <div class="card-body">
-              <h5 class="card-title">Restaurant 1</h5>
-              <p class="card-text small text-muted">
-                Description for restaurant 1.
-              </p>
-            </div>
-            <div class="card-footer bg-transparent border-0">
-              <a href="#" class="btn btn-primary w-100">View menu</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="col d-flex justify-content-center">
-          <div class="card h-100 shadow-sm" style="width: 90%;">
-            <img src="https://markantalya.com/wp-content/uploads/2023/02/burgerking.jpg"
-                 class="card-img-top" alt="Restaurant 2">
-            <div class="card-body">
-              <h5 class="card-title">Restaurant 2</h5>
-              <p class="card-text small text-muted">
-                Description for restaurant 2.
-              </p>
-            </div>
-            <div class="card-footer bg-transparent border-0">
-              <a href="#" class="btn btn-primary w-100">View menu</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="col d-flex justify-content-center">
-          <div class="card h-100 shadow-sm" style="width: 90%;">
-            <img src="https://markantalya.com/wp-content/uploads/2023/02/burgerking.jpg"
-                 class="card-img-top" alt="Restaurant 3">
-            <div class="card-body">
-              <h5 class="card-title">Restaurant 3</h5>
-              <p class="card-text small text-muted">
-                Description for restaurant 3.
-              </p>
-            </div>
-            <div class="card-footer bg-transparent border-0">
-              <a href="#" class="btn btn-primary w-100">View menu</a>
-            </div>
-          </div>
-        </div>
-
+      <div id="restaurant-list" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <!-- Restaurant cards will be inserted here by JavaScript -->
       </div>
     </div>
   </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/restaurant/api/restaurants')
+        .then(response => response.json())
+        .then(data => {
+            const restaurantList = document.getElementById('restaurant-list');
+            restaurantList.innerHTML = ''; // Clear existing cards
+            data.forEach(restaurant => {
+                const card = `
+                    <div class="col d-flex justify-content-center">
+                      <div class="card h-100 shadow-sm" style="width: 90%;">
+                        <img src="https://markantalya.com/wp-content/uploads/2023/02/burgerking.jpg"
+                             class="card-img-top" alt="${restaurant.name}">
+                        <div class="card-body">
+                          <h5 class="card-title">${restaurant.name}</h5>
+                          <p class="card-text small text-muted">
+                            ${restaurant.cuisine} - ${restaurant.city}
+                          </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                          <a href="/restaurant/${restaurant.r_id}" class="btn btn-primary w-100">View menu</a>
+                        </div>
+                      </div>
+                    </div>
+                `;
+                restaurantList.innerHTML += card;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching restaurants:', error);
+            const restaurantList = document.getElementById('restaurant-list');
+            restaurantList.innerHTML = '<p class="text-danger">Failed to load restaurants. Please try again later.</p>';
+        });
+});
+</script>
 {% endblock %}

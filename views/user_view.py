@@ -1,5 +1,5 @@
 # views/user_view.py
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, current_app
 import bcrypt
 from helpers import db_helper
 
@@ -20,7 +20,11 @@ def user_submit_login():
         return "Email and password are required", 400
     
     # Database lookup
-    db = db_helper.get_db_connection("localhost", "root", "123654", "term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
+    if not db:
+        return "Database connection failed", 500
+    
     cursor = db.cursor(dictionary=True)
     
     try:
@@ -73,7 +77,11 @@ def user_submit_signup_form():
     password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
     # DB Insert
-    db = db_helper.get_db_connection("localhost", "root", "123654","term_project")
+    db_config = current_app.config['DB_CONFIG']
+    db = db_helper.get_db_connection()
+    if not db:
+        return "Database connection failed", 500
+        
     cursor = db.cursor()
     
     query = """

@@ -4,6 +4,7 @@ from mysql.connector import Error
 import numpy as np
 import os
 import time
+import uuid
 
 # ---------------------------------------------------------
 # AYARLAR
@@ -14,7 +15,7 @@ BATCH_SIZE = 2000
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123654', # <-- ŞİFRENİ YAZ
+    'password': os.getenv("DB_PASSWORD"), # <-- ŞİFRENİ YAZ
     'database': 'term_project',
     'ssl_disabled': True,
     'allow_local_infile': True
@@ -134,16 +135,17 @@ def import_restaurants(cursor, conn):
         df.rename(columns={'id': 'r_id', 'menu': 'menu_json'}, inplace=True)
         df['rating'] = pd.to_numeric(df['rating'], errors='coerce').fillna(0.0)
         df['rating_count'] = df['rating_count'].astype(str).str.extract(r'(\d+)').fillna(0).astype(int)
+        df['secret'] = [uuid.uuid4().hex for _ in range(len(df.index))]
         df = df.where(pd.notnull(df), None)
 
         cols = ['r_id', 'name', 'city', 'rating', 'rating_count', 'cost', 
-                'cuisine', 'lic_no', 'link', 'address', 'menu_json']
+                'cuisine', 'lic_no', 'link', 'address', 'menu_json', 'secret']
         
         data = df[cols].values.tolist()
         query = """
         INSERT IGNORE INTO Restaurant 
-        (r_id, name, city, rating, rating_count, cost, cuisine, lic_no, link, address, menu_json) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (r_id, name, city, rating, rating_count, cost, cuisine, lic_no, link, address, menu_json, secret) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         insert_data_in_batches(cursor, conn, query, data, "Restaurant")
     except Exception as e:

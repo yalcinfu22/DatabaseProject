@@ -2,13 +2,14 @@
 import mysql.connector
 from flask import current_app
 
-def get_db_connection(host, user, password, db_name):
+def get_db_connection():
+    db_config = current_app.config['DB_CONFIG']
     try:
         db = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=db_name
+            host=db_config['DB_HOST'],
+            user=db_config['DB_USER'],
+            password=db_config['DB_PASSWORD'],
+            database=db_config['DB_NAME']
         )
         return db
     except mysql.connector.Error as err:

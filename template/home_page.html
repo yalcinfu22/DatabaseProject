@@ -680,56 +680,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const restaurantsData = [
-        {
-            id: 1,
-            name: "Restaurant 1",
-            description: "Description for restaurant 1.",
-            rating: 4.5,
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Burger_King_logo_%281999%29.svg/2024px-Burger_King_logo_%281999%29.svg.png",
-            deliveryTime: "20-30 min"
-        },
-        {
-            id: 2,
-            name: "Restaurant 2",
-            description: "Description for restaurant 2.",
-            rating: 4.2,
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Burger_King_logo_%281999%29.svg/2024px-Burger_King_logo_%281999%29.svg.png",
-            deliveryTime: "25-35 min"
-        },
-        {
-            id: 3,
-            name: "Restaurant 3",
-            description: "Description for restaurant 3.",
-            rating: 4.8,
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Burger_King_logo_%281999%29.svg/2024px-Burger_King_logo_%281999%29.svg.png",
-            deliveryTime: "15-25 min"
-        },
-        {
-            id: 4,
-            name: "Pizza Palace",
-            description: "Authentic Italian pizzas with fresh ingredients.",
-            rating: 4.6,
-            image: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1200px-Starbucks_Corporation_Logo_2011.svg.png",
-            deliveryTime: "30-40 min"
-        },
-        {
-            id: 5,
-            name: "Sushi Express",
-            description: "Fresh sushi and Japanese cuisine.",
-            rating: 4.7,
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/McDonald%27s_SVG_logo.svg/2095px-McDonald%27s_SVG_logo.svg.png",
-            deliveryTime: "20-30 min"
-        },
-        {
-            id: 6,
-            name: "Taco Town",
-            description: "Delicious Mexican tacos and burritos.",
-            rating: 4.3,
-            image: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b3/KFC_logo.svg/2048px-KFC_logo.svg.png",
-            deliveryTime: "15-25 min"
-        }
-    ];
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchRestaurants();
+    });
+
+    function fetchRestaurants() {
+        fetch('/restaurant/api/restaurants')
+            .then(response => response.json())
+            .then(data => {
+                renderRestaurants(data);
+            })
+            .catch(error => {
+                console.error('Error fetching restaurants:', error);
+                const grid = document.getElementById('restaurantGrid');
+                grid.innerHTML = '<p class="text-danger">Failed to load restaurants. Please try again later.</p>';
+            });
+    }
 
     function renderRestaurants(restaurants) {
         const grid = document.getElementById('restaurantGrid');
@@ -740,17 +706,17 @@
             col.className = 'col-lg-4 col-md-6';
             
             col.innerHTML = `
-                <div class="restaurant-card" onclick="viewRestaurant(${restaurant.id})">
+                <div class="restaurant-card" onclick="viewRestaurant(${restaurant.r_id})">
                     <div class="restaurant-image">
-                        <img src="${restaurant.image}" alt="${restaurant.name}">
+                        <img src="https://markantalya.com/wp-content/uploads/2023/02/burgerking.jpg" alt="${restaurant.name}">
                     </div>
                     <div class="restaurant-info">
                         <h3 class="restaurant-name">${restaurant.name}</h3>
-                        <p class="restaurant-description">${restaurant.description}</p>
+                        <p class="restaurant-description">${restaurant.cuisine} - ${restaurant.city}</p>
                         <span class="restaurant-rating">
-                            <i class="bi bi-star-fill"></i> ${restaurant.rating}
+                            <i class="bi bi-star-fill"></i> ${restaurant.rating || 'N/A'}
                         </span>
-                        <button class="view-menu-btn" onclick="event.stopPropagation(); viewMenu(${restaurant.id})">
+                        <button class="view-menu-btn" onclick="event.stopPropagation(); viewMenu(${restaurant.r_id})">
                             View menu
                         </button>
                     </div>
@@ -763,10 +729,14 @@
 
     function viewRestaurant(id) {
         console.log('Viewing restaurant:', id);
+        // Redirect to restaurant detail page or menu page
+        window.location.href = `/restaurant/${id}`;
     }
 
     function viewMenu(id) {
         console.log('Viewing menu for restaurant:', id);
+        // Redirect to restaurant menu page
+        window.location.href = `/restaurant/${id}/menu`; // Assuming a menu route like this
     }
 
     document.getElementById('restaurantsLink').addEventListener('click', function(e) {
@@ -779,7 +749,7 @@
         
         setTimeout(() => {
             restaurantsSection.classList.add('show');
-            renderRestaurants(restaurantsData);
+            fetchRestaurants(); // Fetch and render when section is shown
         }, 300);
 
         document.getElementById('homeLink').classList.remove('active');
@@ -809,18 +779,9 @@
     });
 
     document.getElementById('applyFilter').addEventListener('click', function() {
-        const sortBy = document.getElementById('sortBy').value;
-        const minRating = parseFloat(document.getElementById('minRating').value) || 0;
-        
-        let filteredRestaurants = restaurantsData.filter(r => r.rating >= minRating);
-        
-        if (sortBy === 'rating') {
-            filteredRestaurants.sort((a, b) => b.rating - a.rating);
-        } else if (sortBy === 'popular') {
-            filteredRestaurants.sort((a, b) => b.rating - a.rating);
-        }
-        
-        renderRestaurants(filteredRestaurants);
+        // Implement filtering logic here if needed, possibly by calling a filtered API endpoint
+        // For now, just re-fetch all restaurants
+        fetchRestaurants();
     });
 </script>
 

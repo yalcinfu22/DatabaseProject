@@ -1,9 +1,14 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 DEBUG = True
 PORT = 8080
 
 DB_CONFIG = {
-    "DB_HOST": "localhost",
-    "DB_USER": "root",
-    "DB_PASSWORD": "123654",
-    "DB_NAME": "term_project"
+    "DB_HOST": os.getenv("DB_HOST"),
+    "DB_USER": os.getenv("DB_USER"),
+    "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+    "DB_NAME": os.getenv("DB_NAME")
 }
