@@ -36,8 +36,10 @@ def courier_submit_login():
             session['user_id'] = courier_data['c_id']
             session['user_name'] = courier_data['name']
             session['user_type'] = 'courier'
+            print("Giriş başarılı")
             return redirect(url_for('home_page.home_page'))
         else:
+            print("Giriş başarısız")
             return "Invalid email or password", 401
     except Exception as e:
         print(f"Login error: {e}")
@@ -72,7 +74,6 @@ def submit_signup():
     # 2. Get Courier Specific Data
     experience = request.form.get("experience", 0)
     expected_payment = request.form.get("expected_payment", 100)
-    vehicle_type = request.form.get("vehicle_type", "Bicycle")
 
     # 3. Hash Password
     if password:

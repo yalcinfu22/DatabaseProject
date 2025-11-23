@@ -32,8 +32,10 @@ def user_submit_login():
             session['user_id'] = user_data['user_id']
             session['user_name'] = user_data['name']
             session['user_type'] = 'user'
+            print("Giriş başarılı")
             return redirect(url_for('home_page.home_page'))
         else:
+            print("Giriş başarısız")
             return "Invalid email or password", 401
     except Exception as e:
         print(f"Login error: {e}")

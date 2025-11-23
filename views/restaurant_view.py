@@ -63,12 +63,21 @@ def restaurant_submit_signup():
     city = request.form.get("city")
     address = request.form.get("address")
     cuisine = request.form.get("cuisine")
-    restaurant_key = request.form.get("restaurant_key")
+    restaurant_key = request.form.get("restaurant_key") # ! kullanılacak
     description = request.form.get("description", "")
 
     if not password:
         return "Password required", 400
 
+    db = db_helper.get_db_connection("localhost", "root", "123654", "term_project")
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM Restaurant WHERE secret = %s AND name = %s", (restaurant_key, restaurant_name,))
+    restaurant_data = cursor.fetchone()
+
+    if not restaurant_data:
+        return "Invalid restaurant key", 400
+    
     # Hash password
     password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
@@ -77,12 +86,12 @@ def restaurant_submit_signup():
     cursor = db.cursor()
     
     query = """
-        INSERT INTO Restaurant 
-        (restaurant_name, manager_name, email, password, phone, city, address, cuisine, description) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO Restaurant_Manager
+        (name, email, password) 
+        VALUES (%s, %s, %s)
     """
     
-    values = (restaurant_name, manager_name, email, password_hash, phone, city, address, cuisine, description)
+    values = (manager_name, email, password_hash)
     
     try:
         cursor.execute(query, values)
