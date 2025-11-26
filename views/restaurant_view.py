@@ -128,7 +128,7 @@ def list_restaurants():
 
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT r_id, name, city, rating, cuisine, address FROM Restaurant")
+        cursor.execute("SELECT r_id, name, city, rating, cuisine, address FROM Restaurant LIMIT 20")
         restaurants = cursor.fetchall()
         return jsonify(restaurants)
     except Exception as e:

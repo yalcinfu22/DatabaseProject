@@ -6,6 +6,9 @@ import os
 import time
 import uuid
 
+import dotenv
+dotenv.load_dotenv()
+
 # ---------------------------------------------------------
 # AYARLAR
 # ---------------------------------------------------------
