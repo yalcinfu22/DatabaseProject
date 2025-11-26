@@ -19,19 +19,31 @@ def restaurant_submit_login():
     if not email or not password:
         return "Email and password are required", 400
     
-    db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     cursor = db.cursor(dictionary=True)
     
     try:
-        cursor.execute("SELECT * FROM Restaurant WHERE email = %s", (email,))
-        restaurant_data = cursor.fetchone()
+        # Use explicit column aliases to avoid name collision
+        query = """
+            SELECT
+                rm.name AS manager_name,
+                rm.password,
+                r.r_id,
+                r.name AS restaurant_name
+            FROM Restaurant_Manager rm
+            JOIN Restaurant r ON rm.managesId = r.r_id
+            WHERE rm.email = %s
+        """
+        cursor.execute(query, (email,))
+        manager_data = cursor.fetchone()
         
-        if restaurant_data and bcrypt.checkpw(password.encode("utf-8"), restaurant_data['password'].encode("utf-8")):
-            # Login successful
-            session['user_id'] = restaurant_data['r_id']
-            session['user_name'] = restaurant_data['restaurant_name']
+        if manager_data and bcrypt.checkpw(password.encode("utf-8"), manager_data['password'].encode("utf-8")):
+            # Store all relevant info in the session
+            session['user_id'] = manager_data['r_id'] # The restaurant ID
             session['user_type'] = 'restaurant'
+            session['restaurant_name'] = manager_data['restaurant_name']
+            session['manager_name'] = manager_data['manager_name']
+            
             return redirect(url_for('home_page.home_page'))
         else:
             return "Invalid email or password", 401
@@ -56,18 +68,21 @@ def restaurant_signup():
 @restaurant.route('/submit_signup', methods=['POST'])
 def restaurant_submit_signup():
     """Handle restaurant signup form submission"""
+    # Get restaurant and manager details from the form
     restaurant_name = request.form.get("restaurant_name")
-    manager_name = request.form.get("manager_name")
-    email = request.form.get("email")
-    password = request.form.get("password")
-    phone = request.form.get("phone")
     city = request.form.get("city")
     address = request.form.get("address")
     cuisine = request.form.get("cuisine")
+    phone = request.form.get("phone")
     description = request.form.get("description", "")
+    
+    manager_first_name = request.form.get("manager_first_name")
+    manager_last_name = request.form.get("manager_last_name")
+    email = request.form.get("email")
+    password = request.form.get("password")
 
-    if not password:
-        return "Password required", 400
+    if not all([restaurant_name, city, address, cuisine, phone, manager_first_name, email, password]):
+        return "All required fields must be filled out.", 400
 
     db = db_helper.get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -76,20 +91,20 @@ def restaurant_submit_signup():
         # 1. Create Restaurant
         secret_key = uuid.uuid4().hex
         restaurant_query = """
-            INSERT INTO Restaurant (name, city, address, cuisine, secret)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO Restaurant (name, city, address, cuisine, phone, description, secret)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        restaurant_values = (restaurant_name, city, address, cuisine, secret_key)
+        restaurant_values = (restaurant_name, city, address, cuisine, phone, description, secret_key)
         cursor.execute(restaurant_query, restaurant_values)
         new_restaurant_id = cursor.lastrowid
 
         # 2. Create Restaurant Manager
         password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
         manager_query = """
-            INSERT INTO Restaurant_Manager (name, email, password, managesId)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO Restaurant_Manager (name, surname, email, password, managesId)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        manager_values = (manager_name, email, password_hash, new_restaurant_id)
+        manager_values = (manager_first_name, manager_last_name, email, password_hash, new_restaurant_id)
         cursor.execute(manager_query, manager_values)
 
         db.commit()
@@ -103,7 +118,7 @@ def restaurant_submit_signup():
         cursor.close()
         db.close()
 
-    return redirect(url_for("home_page.home_page"))
+    return redirect(url_for("restaurant.restaurant_login"))
 
 @restaurant.route('/<int:r_id>')
 def restaurant_detail(r_id):

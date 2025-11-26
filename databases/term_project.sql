@@ -33,6 +33,8 @@ CREATE TABLE Restaurant (
     lic_no VARCHAR(100),
     link VARCHAR(255),
     address TEXT,
+    phone VARCHAR(30),
+    description TEXT,
     menu_json TEXT, 
     secret VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
