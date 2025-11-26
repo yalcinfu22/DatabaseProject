@@ -108,11 +108,12 @@ def restaurant_submit_signup():
 @restaurant.route('/<int:r_id>')
 def restaurant_detail(r_id):
     """Restaurant detail page"""
-    # Check if the logged-in user is a manager for THIS restaurant
-    is_manager = (
-        session.get('user_type') == 'restaurant' and 
-        str(session.get('user_id')) == str(r_id)
-    )
+    # DEMO MODE: Always admin
+    is_manager = True
+    # is_manager = (
+    #     session.get('user_type') == 'restaurant' and 
+    #     str(session.get('user_id')) == str(r_id)
+    # )
     
     return render_template(
         'restaurant_detail.html', 
