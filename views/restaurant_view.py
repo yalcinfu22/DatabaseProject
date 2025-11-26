@@ -105,6 +105,21 @@ def restaurant_submit_signup():
 
     return redirect(url_for("home_page.home_page"))
 
+@restaurant.route('/<int:r_id>')
+def restaurant_detail(r_id):
+    """Restaurant detail page"""
+    # Check if the logged-in user is a manager for THIS restaurant
+    is_manager = (
+        session.get('user_type') == 'restaurant' and 
+        str(session.get('user_id')) == str(r_id)
+    )
+    
+    return render_template(
+        'restaurant_detail.html', 
+        r_id=r_id, 
+        is_manager=is_manager
+    )
+
 @restaurant.route('/api/restaurants', methods=['GET'])
 def list_restaurants():
     db = db_helper.get_db_connection()

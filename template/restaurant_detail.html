@@ -1,0 +1,75 @@
+<button id="btnAdd" class="btn btn-primary mb-3" {% if not is_manager %}style="display:none" {% endif %}>
+  Add Menu Item
+</button>
+
+<div id="menu-cards" class="row g-3"></div>
+
+<script>
+  const rId = JSON.parse('{{ r_id | tojson }}');
+  const isManager = JSON.parse('{{ is_manager | tojson }}');
+
+  async function loadMenus() {
+    const res = await fetch(`/menus/search?r_id=${rId}&order_by=price&order=asc&limit=100`);
+    const data = await res.json();
+    const wrap = document.getElementById('menu-cards');
+    wrap.innerHTML = '';
+    data.forEach(m => {
+      const actions = isManager ? `
+      <div class="mt-2 d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary" onclick="editMenu(${m.m_id}, ${m.price})">Update</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="delMenu(${m.m_id})">Delete</button>
+      </div>` : '';
+      wrap.insertAdjacentHTML('beforeend', `
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">${m.food_name || '(Unnamed)'}</h5>
+            <p class="card-text small text-muted">${m.cuisine || ''} · ${m.veg || ''}</p>
+            <div class="fw-bold">${m.price?.toFixed ? m.price.toFixed(2) : m.price} ₺</div>
+            ${actions}
+          </div>
+        </div>
+      </div>
+    `);
+    });
+  }
+
+  async function delMenu(mId) {
+    if (!confirm('Delete this menu item?')) return;
+    const res = await fetch(`/menus/${mId}`, { method: 'DELETE' });
+    if (res.ok) loadMenus();
+  }
+
+  async function editMenu(mId, oldPrice) {
+    const price = prompt('New price:', oldPrice);
+    if (price === null) return;
+    const res = await fetch(`/menus/${mId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ price: parseFloat(price) })
+    });
+    if (res.ok) loadMenus();
+  }
+
+  document.getElementById('btnAdd').onclick = async () => {
+    const foodName = prompt('Food name:');
+    if (!foodName) return;
+    const price = parseFloat(prompt('Price:') || '0');
+    const veg = prompt('Veg/Non-Veg/Other (optional):') || null;
+    const cuisine = prompt('Cuisine (optional):') || null;
+
+    const res = await fetch('/menus/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ r_id: rId, food_name: foodName, veg_or_non_veg: veg, cuisine, price })
+    });
+    if (res.ok) {
+      loadMenus();
+    } else {
+      const err = await res.json();
+      alert('Error adding menu: ' + (err.error || 'Unknown error'));
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', loadMenus);
+</script>
