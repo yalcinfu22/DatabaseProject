@@ -105,7 +105,7 @@ def restaurant_submit_signup():
 
     return redirect(url_for("home_page.home_page"))
 
-@restaurant.route('/<int:r_id>')
+@restaurant.route('/<int:r_id>/menu')
 def restaurant_detail(r_id):
     """Restaurant detail page"""
     # DEMO MODE: Always admin
