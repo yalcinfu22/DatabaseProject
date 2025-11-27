@@ -109,7 +109,7 @@ CREATE TABLE Orders (
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
     FOREIGN KEY (r_id) REFERENCES Restaurant(r_id) ON DELETE CASCADE,
     FOREIGN KEY (c_id) REFERENCES Courier(c_id) ON DELETE RESTRICT,
-    FOREIGN KEY (m_id) REFERENCES Menu(m_id) ON DELETE RESTRICT
+    FOREIGN KEY (m_id) REFERENCES Menu(m_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -----------------------------------------------------
