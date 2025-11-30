@@ -1,109 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GitHere - User Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Your custom CSS (optional) -->
-  <link rel="stylesheet" href="../static/css/user_reg.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 1. LIGHTER BACKGROUND */
+        body { 
+            background-color: #f8fbff; /* Very airy, almost white blue */
+            padding-top: 25px; 
+            padding-bottom: 40px;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* 2. PROFILE SECTION (Lighter Blue Gradient) */
+        .profile-section {
+            /* Lighter, friendlier blue gradient */
+            background: linear-gradient(135deg, #6ea8fe 0%, #3d8bfd 100%); 
+            color: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 8px 15px rgba(61, 139, 253, 0.25); /* Lighter blue shadow */
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+            margin-bottom: 25px;
+        }
+        .profile-section:hover { 
+            transform: translateY(-5px); 
+        }
+        .profile-circle {
+            width: 90px; height: 90px;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-link { text-decoration: none; color: inherit; display: block; }
+        .profile-subtext { color: rgba(255, 255, 255, 0.9); font-size: 0.9em; }
+        
+        /* 3. REVIEWS SECTION (Yellow/Orange Theme) */
+        .reviews-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #f0f0f0;
+            /* Top border to emphasize the "Yellow/Orange" theme */
+            border-top: 5px solid #ffc107; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            height: 100%;
+        }
+        .review-header-text {
+            color: #fd7e14; /* Orange text for the header */
+            font-weight: bold;
+        }
+        .review-row { cursor: pointer; transition: background 0.2s; border-radius: 8px; }
+        .review-row:hover { background-color: #fff9e6; /* Very light yellow hover */ }
+        
+        /* Table headers for reviews specific styling */
+        .table-header-reviews th { 
+            color: #bfa15f; /* Muted gold color for text */
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            border-bottom: 2px solid #ffecb5;
+        }
+
+        /* 4. NAVIGATION BUTTONS (Light Blue Pill Shape) */
+        .nav-pill-btn {
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-weight: 600;
+            border: 2px solid #6ea8fe; /* Lighter Blue border */
+            background: white;
+            color: #3d8bfd; /* Lighter Blue text */
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .nav-pill-btn:hover {
+            background: #3d8bfd;
+            border-color: #3d8bfd;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(61, 139, 253, 0.2);
+        }
+        .nav-pill-btn.disabled {
+            border-color: #e9ecef;
+            color: #ced4da;
+            background-color: #f8f9fa;
+            box-shadow: none;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* 5. MAIN TASKS TABLE (Clean Blue) */
+        .tasks-table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+            margin-top: 10px;
+        }
+        .custom-table-header {
+            background-color: #f0f7ff; /* Very pale blue header */
+            color: #3d8bfd;
+            border-radius: 10px;
+        }
+        .custom-table-header th { border: none; padding: 15px; font-weight: 600; }
+        .custom-table-header th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .custom-table-header th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        
+        .table-row-item td { padding: 18px 15px; vertical-align: middle; border-bottom: 1px solid #f5f8fc; }
+        
+        /* Specific Styles for Text */
+        .text-blue-light { color: #3d8bfd; }
+    </style>
 </head>
 <body>
 
-<!-- full-height dark background, center content -->
-<section class="bg-dark d-flex align-items-center" style="min-height: 100vh;">
-  <form action="/login_user" method="POST" class="w-100">
-    <div class="container">
-      <div class="row justify-content-center">
+<div class="container-fluid px-4 px-lg-5">
+    <div class="row g-4"> 
         
-        <!-- limit card width so it doesn’t become too wide -->
-        <div class="col-lg-10 col-xl-8">
-          <div class="card shadow-lg border-0 rounded-4 overflow-hidden my-4">
+        <div class="col-lg-3 col-md-4">
             
-            <!-- make columns same height -->
-            <div class="row g-0 align-items-stretch">
-
-              <!-- Left image -->
-              <div class="col-md-6 d-none d-md-block">
-                <img
-                  src="../static/images/user_reg_img.jpg"
-                  alt="Food delivery image"
-                  class="img-fluid h-100 w-100"
-                  style="object-fit: cover;"
-                />
-              </div>
-
-              <!-- Right form -->
-              <div class="col-md-6 d-flex align-items-center">
-                <div class="card-body p-4 p-md-5 text-black">
-
-                  <h3 class="mb-4 text-uppercase">Login as User</h3>
-
-                  <!-- Email -->
-                  <div class="mb-4">
-                    <label class="form-label" for="loginEmail">Email</label>
-                    <input
-                      type="email"
-                      id="loginEmail"
-                      name="email"
-                      class="form-control form-control-lg"
-                      placeholder="e.g., amr@gmail.com"
-                      required
-                    >
-                  </div>
-
-                  <!-- Password -->
-                  <div class="mb-4">
-                    <label class="form-label" for="loginPassword">Password</label>
-                    <input
-                      type="password"
-                      id="loginPassword"
-                      name="password"
-                      class="form-control form-control-lg"
-                      placeholder="Enter your password"
-                      required
-                    >
-                  </div>
-
-                  <!-- Remember / Forgot -->
-                  <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="1" id="rememberMe" name="remember_me">
-                      <label class="form-check-label" for="rememberMe">
-                        Remember me
-                      </label>
+            <a href="{{ url_for('courier.profile_page') }}" class="profile-link">
+                <div class="profile-section">
+                    <div class="profile-circle">
+                        <i class="fas fa-user fa-3x"></i>
                     </div>
-                    <a href="#" class="text-decoration-none">Forgot password?</a>
-                  </div>
-
-                  <!-- Buttons -->
-                  <div class="d-flex justify-content-end pt-3">
-                    <button type="reset" class="btn btn-light btn-lg me-2">Reset</button>
-                    <button type="submit" class="btn btn-warning btn-lg">Login</button>
-                  </div>
-
-                  <!-- Signup link -->
-                  <div class="mt-4">
-                    <p class="mb-0">
-                      Don’t have an account?
-                      <a href="{{ url_for('user_signup')}}" class="text-decoration-none">Signup as User</a>
+                    <h3 class="mb-1">{{ courier.name }} {{ courier.surname }}</h3>
+                    <p class="profile-subtext mb-0">
+                        <i class="fas fa-cog"></i> View Profile & Settings
                     </p>
-                  </div>
-
                 </div>
-              </div>
+            </a>
 
-            </div> <!-- row -->
-          </div> <!-- card -->
-        </div> <!-- col -->
+            <div class="reviews-container">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2" style="border-bottom: 1px solid #ffecb5;">
+                    <h5 class="mb-0 review-header-text">
+                        <i class="fas fa-star text-warning"></i> Reviews
+                    </h5>
+                    <small class="text-muted">History</small>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-borderless table-sm">
+                        <thead class="table-header-reviews">
+                            <tr>
+                                <th>Order</th>
+                                <th>Rate</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if reviews %}
+                                {% for review in reviews %}
+                                <tr class="review-row" data-url="{{ url_for('courier.delivery_history_page') }}">
+                                    <td class="text-secondary fw-bold">#{{ review.t_id }}</td>
+                                    <td class="fw-bold" style="color: #ffc107;">
+                                        <i class="fas fa-star"></i> {{ review.rating }}
+                                    </td>
+                                    <td class="text-truncate text-muted" style="max-width: 80px;">{{ review.comment }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="fas fa-star-half-alt fa-2x mb-2 text-warning opacity-50"></i><br>
+                                        No reviews yet.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-      </div> <!-- row -->
-    </div> <!-- container -->
-  </form>
-</section>
+        <div class="col-lg-9 col-md-8">
+            
+            <div class="row mb-4 g-3">
+                <div class="col-md-4">
+                    <a href="{{ url_for('courier.active_tasks_page') }}" class="nav-pill-btn active-pill">
+                        <i class="fas fa-clipboard-list me-2"></i>Tasks Dashboard
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    {% if courier.r_id %}
+                        <a href="{{ url_for('courier.my_restaurant_page') }}" class="nav-pill-btn">
+                            <i class="fas fa-store me-2"></i>My Restaurant
+                        </a>
+                    {% else %}
+                        <span class="nav-pill-btn disabled" title="You are not hired yet">
+                            <i class="fas fa-store-slash me-2"></i>Restaurant (N/A)
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <a href="{{ url_for('courier.search_positions_page') }}" class="nav-pill-btn">
+                        <i class="fas fa-search-location me-2"></i>Search Positions
+                    </a>
+                </div>
+            </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="tasks-table-container">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
+                         style="width: 45px; height: 45px; background-color: #e7f1ff; color: #3d8bfd;">
+                        <i class="fas fa-shipping-fast fa-lg"></i>
+                    </div>
+                    <h4 class="mb-0 fw-bold text-secondary">Active Deliveries</h4>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="custom-table-header">
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Menu Item</th>
+                                <th>Customer Address</th>
+                                <th>Contact</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if active_tasks %}
+                                {% for task in active_tasks %}
+                                <tr class="table-row-item">
+                                    <td class="fw-bold text-blue-light">#{{ task.t_id }}</td>
+                                    <td>
+                                        <span class="fw-semibold text-dark">{{ task.menu_name }}</span><br>
+                                        <small class="text-muted">{{ task.customer_name }}</small>
+                                    </td>
+                                    <td class="text-secondary"><i class="fas fa-map-marker-alt text-danger me-2 opacity-75"></i>{{ task.address }}</td>
+                                    <td>
+                                        <a href="tel:{{ task.phone }}" class="text-decoration-none text-success fw-semibold">
+                                            <i class="fas fa-phone-alt me-1"></i> {{ task.phone }}
+                                        </a>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-4" style="border-color: #3d8bfd; color: #3d8bfd;">
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-bicycle fa-3x mb-3" style="color: #cbd5e1;"></i>
+                                            <p class="h5">No active tasks</p>
+                                            <p class="small">You are free to take a break or search for new positions.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const rows = document.querySelectorAll(".review-row");
+        rows.forEach(row => {
+            row.addEventListener("click", () => {
+                const url = row.getAttribute("data-url");
+                if(url) window.location.href = url;
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -24,7 +24,7 @@ def restaurant_submit_login():
     cursor = db.cursor(dictionary=True)
     
     try:
-        cursor.execute("SELECT * FROM Restaurant WHERE email = %s", (email,))
+        cursor.execute("SELECT * FROM restaurant_manager WHERE email = %s", (email,))
         restaurant_data = cursor.fetchone()
         
         if restaurant_data and bcrypt.checkpw(password.encode("utf-8"), restaurant_data['password'].encode("utf-8")):

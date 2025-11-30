@@ -101,7 +101,7 @@ CREATE TABLE Orders (
     currency VARCHAR(10) DEFAULT 'USD',
     m_id INT NOT NULL,
     c_id INT NOT NULL,
-    IsDelivered BOOLEAN DEFAULT TRUE,
+    IsDelivered BOOLEAN DEFAULT FALSE,
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
