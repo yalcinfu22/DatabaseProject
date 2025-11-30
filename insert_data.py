@@ -92,6 +92,7 @@ def import_food(cursor, conn):
         df = pd.read_csv(file_path)
         # NULL KONTROLÜ: Veg/Non-Veg boşsa 'Non-Veg' yap
         df['veg_or_non_veg'] = df['veg_or_non_veg'].fillna('Non-Veg')
+        df = df.where(pd.notnull(df), None)
         
         data = df[['f_id', 'item', 'veg_or_non_veg']].values.tolist()
         query = "INSERT IGNORE INTO Food (f_id, item, veg_or_non_veg) VALUES (%s, %s, %s)"
@@ -160,7 +161,11 @@ def import_couriers(cursor, conn):
     try:
         df = pd.read_csv(file_path)
         df.rename(columns={'MaritalStatus': 'Marital_Status'}, inplace=True)
-        df = df.where(pd.notnull(df), None)
+        df['rating'] = pd.to_numeric(df['rating'], errors='coerce').fillna(0.0)
+        df['ratingCount'] = pd.to_numeric(df['ratingCount'], errors='coerce').fillna(0).astype(int)
+        df['taskCount'] = pd.to_numeric(df['taskCount'], errors='coerce').fillna(0).astype(int)
+        df['experience'] = pd.to_numeric(df['experience'], errors='coerce').fillna(0).astype(int)
+        df.replace({np.nan: None}, inplace=True)
         
         # c_id AUTO_INCREMENT olduğu için CSV'den okumuyoruz veya
         # eğer CSV'de c_id yoksa sorun yok.
