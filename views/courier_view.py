@@ -2,6 +2,7 @@ import mysql.connector
 import bcrypt
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session, current_app
 from helpers import db_helper
+from datetime import datetime
 
 courier = Blueprint('courier', __name__)
 
@@ -24,7 +25,6 @@ def courier_submit_login():
         return "Email and password are required", 400
     
     # Database lookup
-        db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     cursor = db.cursor(dictionary=True)
     
@@ -33,12 +33,15 @@ def courier_submit_login():
         courier_data = cursor.fetchone()
         
         if courier_data and bcrypt.checkpw(password.encode("utf-8"), courier_data['password'].encode("utf-8")):
-            # Login successful
+            # Login successful - Store courier info in session
             session['user_id'] = courier_data['c_id']
             session['user_name'] = courier_data['name']
+            session['user_surname'] = courier_data.get('surname', '')
             session['user_type'] = 'courier'
-            print("Giriş başarılı")
-            return redirect(url_for('home_page.home_page'))
+            session['courier_r_id'] = courier_data.get('r_id')  # Restaurant ID if assigned
+            
+            print("Giriş başarılı - Redirecting to dashboard")
+            return redirect(url_for('courier.courier_dashboard'))  # Go to dashboard instead of home
         else:
             print("Giriş başarısız")
             return "Invalid email or password", 401
@@ -48,6 +51,97 @@ def courier_submit_login():
     finally:
         cursor.close()
         db.close()
+
+@courier.route('/dashboard')
+def courier_dashboard():
+    """
+    Simplified Courier Dashboard based on the sketch.
+    Loads: Profile info, Left-side Review/History list, and Active Tasks.
+    """
+    if 'user_id' not in session or session.get('user_type') != 'courier':
+        return redirect(url_for('courier.courier_login'))
+    
+    courier_id = session['user_id']
+    db = db_helper.get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT c_id, name, surname, r_id, rating, taskCount 
+            FROM Courier 
+            WHERE c_id = %s
+        """, (courier_id,))
+        courier_info = cursor.fetchone()
+
+        # 2. Get Active Tasks (FIXED: Joining Food table to get item name)
+        cursor.execute("""
+            SELECT t.t_id, u.name as customer_name, u.address, 
+                   f.item as menu_name  -- Get 'item' from Food table, not Menu
+            FROM Task t
+            JOIN User u ON t.user_id = u.user_id
+            LEFT JOIN Menu m ON t.m_id = m.m_id
+            LEFT JOIN Food f ON m.f_id = f.f_id  -- JOIN ADDED HERE
+            WHERE t.c_id = %s AND t.status = 0
+            ORDER BY t.task_date ASC
+        """, (courier_id,))
+        active_tasks = cursor.fetchall()
+
+        # 3. Get Recent History (FIXED: Joining Food table here too)
+        cursor.execute("""
+            SELECT t.t_id, f.item as menu_name
+            FROM Task t
+            LEFT JOIN Menu m ON t.m_id = m.m_id
+            LEFT JOIN Food f ON m.f_id = f.f_id  -- JOIN ADDED HERE
+            WHERE t.c_id = %s AND t.status = 1
+            ORDER BY t.task_date DESC
+            LIMIT 5
+        """, (courier_id,))
+        recent_history = cursor.fetchall()
+
+        # Add dummy data for fields missing in SQL
+        for task in active_tasks:
+            task['phone'] = "+90 555 123 4567"
+            # Fallback if menu/food lookup failed (e.g. deleted item)
+            if not task['menu_name']: task['menu_name'] = "Unknown Item"
+            
+        for review in recent_history:
+            review['rating'] = 5.0
+            review['comment'] = "Great service!"
+            if not review['menu_name']: review['menu_name'] = "Unknown Item"
+
+        return render_template('courier_dashboard.html',
+                             courier=courier_info,
+                             active_tasks=active_tasks,
+                             reviews=recent_history)
+
+    except Exception as e:
+        print(f"Dashboard error: {e}")
+        return f"Error: {e}", 500
+    finally:
+        cursor.close()
+        db.close()
+# --- Placeholder Routes for Navigation (As requested) ---
+
+@courier.route('/profile')
+def profile_page():
+    return "Profile Page & Settings (To Be Implemented)"
+
+@courier.route('/tasks/active')
+def active_tasks_page():
+    return "Detailed Active Tasks Page (To Be Implemented)"
+
+@courier.route('/restaurant/my')
+def my_restaurant_page():
+    # Logic: Check if user has r_id, if not show error, else show details
+    return "My Restaurant Details (To Be Implemented)"
+
+@courier.route('/positions/search')
+def search_positions_page():
+    return "Search Available Positions (To Be Implemented)"
+
+@courier.route('/history')
+def delivery_history_page():
+    return "Full Order History (To Be Implemented)"
 
 @courier.route('/logout')
 def courier_logout():
@@ -86,7 +180,6 @@ def submit_signup():
     expected_min = float(expected_payment)
     expected_max = expected_min * 1.2 
 
-    db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     cursor = db.cursor()
 
@@ -103,6 +196,7 @@ def submit_signup():
         cursor.execute(query, values)
         db.commit()
         print("Courier Registered Successfully via Form")
+        return redirect(url_for("courier.courier_login"))  # Go to login after signup
     except Exception as e:
         print(f"Error registering courier: {e}")
         db.rollback()
@@ -111,10 +205,6 @@ def submit_signup():
         cursor.close()
         db.close()
 
-    # Redirect to Home Page after success
-    return redirect(url_for("home_page.home_page"))
-
-
 # ==========================================
 # API ROUTES (JSON - For Mobile/External Apps)
 # ==========================================
@@ -122,7 +212,6 @@ def submit_signup():
 @courier.route("/", methods=["GET"])
 def get_all_couriers():
     """Fetches all couriers as JSON."""
-    db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
@@ -141,7 +230,6 @@ def get_all_couriers():
 @courier.route("/<int:courier_id>", methods=["GET"])
 def get_courier(courier_id):
     """Fetches a single courier by c_id."""
-    db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
@@ -193,7 +281,6 @@ def create_courier_api():
     expected_min = float(expected_payment)
     expected_max = expected_min * 1.2
 
-    db_config = current_app.config['DB_CONFIG']
     db = db_helper.get_db_connection()
     if not db:
         return jsonify({"error": "Database connection failed"}), 500
