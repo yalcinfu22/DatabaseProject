@@ -267,7 +267,15 @@ def list_restaurants():
 
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT r_id, name, city, rating, cuisine, address FROM Restaurant LIMIT 20")
+        search_query = request.args.get('q')
+        
+        if search_query:
+            sql_query = "SELECT r_id, name, city, rating, cuisine, address FROM Restaurant WHERE name LIKE %s LIMIT 20"
+            cursor.execute(sql_query, (f"%{search_query}%",))
+        else:
+            sql_query = "SELECT r_id, name, city, rating, cuisine, address FROM Restaurant LIMIT 20"
+            cursor.execute(sql_query)
+            
         restaurants = cursor.fetchall()
         return jsonify(restaurants)
     except Exception as e:
