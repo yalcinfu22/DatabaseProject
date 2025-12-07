@@ -695,11 +695,49 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetchRestaurants();
+        const searchInput = document.querySelector('input[name="q"]');
+        const searchForm = document.querySelector('.search-wrapper');
+
+        // Fetch initial restaurants when the page loads, or if there's a query in the URL
+        const initialQuery = new URLSearchParams(window.location.search).get('q') || '';
+        if (initialQuery) {
+            searchInput.value = initialQuery;
+        }
+        showRestaurantsSection(initialQuery);
+
+
+        // Live search on input
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = this.value;
+                fetchRestaurants(query);
+            }, 300); // Debounce to avoid too many requests
+        });
+
+        // Prevent form submission from reloading the page
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = searchInput.value;
+            fetchRestaurants(query);
+            showRestaurantsSection(query);
+        });
+
+        // Also update when filter button is clicked
+        document.getElementById('applyFilter').addEventListener('click', function() {
+            const query = searchInput.value;
+            fetchRestaurants(query);
+        });
     });
 
-    function fetchRestaurants() {
-        fetch('/restaurant/api/restaurants')
+    function fetchRestaurants(query = '') {
+        let apiUrl = '/restaurant/api/restaurants';
+        if (query) {
+            apiUrl += `?q=${encodeURIComponent(query)}`;
+        }
+
+        fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 renderRestaurants(data);
@@ -714,6 +752,11 @@
     function renderRestaurants(restaurants) {
         const grid = document.getElementById('restaurantGrid');
         grid.innerHTML = '';
+
+        if (restaurants.length === 0) {
+            grid.innerHTML = '<p class="text-center col-12">No restaurants found matching your search.</p>';
+            return;
+        }
 
         restaurants.forEach(restaurant => {
             const col = document.createElement('div');
@@ -742,20 +785,14 @@
     }
 
     function viewRestaurant(id) {
-        console.log('Viewing restaurant:', id);
-        // Redirect to restaurant detail page or menu page
         window.location.href = `/restaurant/${id}`;
     }
 
     function viewMenu(id) {
-        console.log('Viewing menu for restaurant:', id);
-        // Redirect to restaurant menu page
-        window.location.href = `/restaurant/${id}/menu`; // Assuming a menu route like this
+        window.location.href = `/restaurant/${id}/menu`;
     }
 
-    document.getElementById('restaurantsLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        
+    function showRestaurantsSection(query = '') {
         const carousel = document.getElementById('homeCarousel');
         const restaurantsSection = document.getElementById('restaurantsSection');
         
@@ -763,15 +800,20 @@
         
         setTimeout(() => {
             restaurantsSection.classList.add('show');
-            fetchRestaurants(); // Fetch and render when section is shown
+            fetchRestaurants(query); // Fetch and render when section is shown
         }, 300);
 
         document.getElementById('homeLink').classList.remove('active');
-        this.classList.add('active');
+        document.getElementById('restaurantsLink').classList.add('active');
 
         setTimeout(() => {
             restaurantsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 400);
+    }
+
+    document.getElementById('restaurantsLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showRestaurantsSection();
     });
 
     document.getElementById('homeLink').addEventListener('click', function(e) {
@@ -790,12 +832,6 @@
         this.classList.add('active');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    document.getElementById('applyFilter').addEventListener('click', function() {
-        // Implement filtering logic here if needed, possibly by calling a filtered API endpoint
-        // For now, just re-fetch all restaurants
-        fetchRestaurants();
     });
 </script>
 
